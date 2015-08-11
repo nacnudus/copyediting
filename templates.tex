@@ -1,0 +1,53 @@
+% Copy editing
+\usepackage{color}
+\def\query#1{\textbf{[{\colorbox{yellow}{AQ: {#1}}}]}}
+\def\typesetter#1{\textbf{[{\colorbox{cyan}{TYPESETTER: {#1}}}]}}
+\def\figmark#1{\textbf{[{\colorbox{yellow}{Please insert Figure {#1} near here}}]}}
+\def\tabmark#1{\textbf{[{\colorbox{yellow}{Please insert Table {#1} near here}}]}}
+\def\extension#1{\textbf{[{\colorbox{yellow}{Please insert link for Extension~{#1} in the above paragraph}}]}}
+\usepackage[hang,flushmargin]{footmisc}
+\usepackage{endnotes}
+\let\footnote=\endnote
+\linespread{2} % Double line-spacing
+\bibpunct{(}{)}{;}{a}{,}{,} % Reference style
+\usepackage[sort]{natbib} % And delete the authors' own natbib
+
+% Sage
+\journal{Mathematics and Mechanics of Solids}
+\volume{000}
+\issue{00}
+\copyrightline{$\copyright$ Copyright} 
+\firstpage{0} 
+\lastpage{0} 
+\doi{doi number} 
+\articletype{Article type} 
+\pubyear{2015}
+
+% Optional
+\renewcommand{\d}{{\,\rm d}} % Upright d as in dy/dx, \int{} dx
+\usepackage{times}
+\usepackage[format=plain,labelsep=period,labelfont=bf,size=small]{caption}
+\usepackage{mathptmx}
+\usepackage{txfonts}
+\usepackage{fullpage}
+\hyphenpenalty=1000
+\pretolerance=8000
+\tolerance=9500
+\hbadness=8000
+\vbadness=9000
+\displaywidowpenalty=0
+\clubpenalty=10000
+\widowpenalty=10000
+\usepackage{varwidth}
+\usepackage{xcolor}
+
+
+\section*{Funding} 
+
+This research received no specific grant from any funding agency in the public,
+commercial, or not-for-profit sectors.
+
+This work was supported by xxxxxxxxxx (grant number xxxxxxxxx).
+
+\query{Please check that the funding statement is correct.}
+

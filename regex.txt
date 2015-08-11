@@ -1,0 +1,111 @@
+# Find long numbers without commas (need fixing)
+[0-9]{5,}
+^[0-9][0-9],[0-9]{3}
+
+# Remove \textcolour{red}{sometext}
+%s/\\textcolor{red}{\(.\+\)}/\1/gc
+
+# Find eqref without preceeding "equation"
+%s/\([^equation]\ \)\(\\eqref\)/\1equation\ \2/gc
+
+# Find acronyms and their definitions
+[A-Z]\+[:alnum:]*[A-Z]\+[:alnum:]*
+([A-Z]\+[:alnum:]*[A-Z]\+[:alnum:]*)
+
+# Correct - to --
+# and this / that to this/that
+%s/\ -\ /--/gc
+%s/-/--/gc
+%s/\ \/\ /\//gc
+
+# <space>, and <space>.
+%s/\ ,/,/gc
+%s/\ \././gc
+
+# cdots -> ldots
+%s/\\cdots/\\ldots/gc
+
+# et~al.\ 
+%s/et\ al/et\~al/gc
+%s/et\~al\.\ /et\~al\.\\ /gc
+
+# i.e. e.g. not followed by small spaces
+%s/i\.e\.\ ,/i\.e\.\ /gc
+%s/e\.g\.\ ,/e\.g\.\ /gc
+
+# Section, Table, Figure, Lemma, equation
+%s/section\(\_s\?\)\(\\ref{\)\C/Section\ \2/gc
+%s/table\(\_s\?\)\(\\ref{\)\C/Table\ \2/gc
+%s/figure\(\_s\?\)\(\\ref{\)\C/Figure\ \2/gc
+%s/lemma\(\_s\?\)\(\\ref{\)\C/Lemma\ \2/gc
+%s/Equation\(\_s\?\)\(\\ref{\)\C/equation\ \2/gc
+%s/Eqn\./equation/gc
+%s/Sec\./Section/gc
+
+# Remove || in Google Scholar bibtex
+%s/||\ //gc
+
+# Remove parenthesis from around \cite
+%s/(\\cite{\([^}]\+\)})/\\cite{\1}/gc
+
+# Add spaces before \cite
+%s/\([^\ ]\)\\cite{/\1\ \\cite{/gc
+
+# "in \citep" -> "in \citet"
+%s/\ in\ \\citep/\ in\ \\citet/gc
+%s/\ from\ \\citep/\ in\ \\citet/gc
+
+# Add spaces before parentheses 
+%s/\([^ ]\)(/\1\ (/gc
+
+# Upright T for transpose
+%s/\^T/\^{\\rm\ T}/gc
+
+# Upright d for dt (integration)
+%s/\\frac{d}{d\ /\\frac{\rm\ d}{\d\ /gc
+%s/dt/\\d\ t/gc
+
+# vs not vs.
+%s/vs\./vs/gc
+
+# upright mu as in nanometers \usepackage{upgreek}
+%s/\\mu/\\upmu/gc
+%s/\\upmu\ m/\\upmu\ \\mathrm{m}/gc
+%s/\\upmu\ \\m/\\upmu\ \\mathrm{m}/gc
+%s/\\upmu/\\,\\upmu/gc
+
+# Close up non words e.g. nonconvex
+%s/non-/non/gc
+
+# compared to -> compared with
+%s/compared\ to/compared\ with/gc
+
+# Capital Hessian
+%s/hessian\C/Hessian/gc
+
+# Replace punctuation at the end of equations
+%s/\\text{.}//gc
+%s/\\text{,}//gc
+%s/\\text{\\,\.}//gc
+%s/\\text{\,\ }//gc
+
+# Fig. -> Figure
+%s/Fig\.\C/Figure/gc
+
+# sine, cosine, max, min, arg
+%s/sin(/\\sin(/gc
+%s/cos(/\\cos(/gc
+%s/max(/\\max(/gc
+%s/min(/\\min(/gc
+%s/arg(/\\arg(/gc
+
+# Correct $n^{th}$ to $n$th
+%s/\^{st}\$/\$st/gc
+%s/\^{rd}\$/\$rd/gc
+%s/\^{th}\$/\$th/gc
+
+# Correct straight quotes to smart quotes
+%s/"\(.\{-}\)"/``\1''/gc
+
+# Spaces between numbers and units
+%s/\([0-9]\+\)\([a-zA-Z]\+\)/\1\\,\2/gc
