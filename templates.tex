@@ -5,12 +5,73 @@
 \def\figmark#1{\textbf{[{\colorbox{yellow}{Please insert Figure {#1} near here}}]}}
 \def\tabmark#1{\textbf{[{\colorbox{yellow}{Please insert Table {#1} near here}}]}}
 \def\extension#1{\textbf{[{\colorbox{yellow}{Please insert link for Extension~{#1} in the above paragraph}}]}}
-\usepackage[hang,flushmargin]{footmisc}
+\usepackage[hang,flushmargin]{footmisc} % Footnote at bottom without indentation (e.g. for corresponding author)
 \usepackage{endnotes}
 \let\footnote=\endnote
+\setcounter{secnumdepth}{3} % For section numbers in sage.cls
 \linespread{2} % Double line-spacing
-\bibpunct{(}{)}{;}{a}{,}{,} % Reference style
-\usepackage[sort]{natbib} % And delete the authors' own natbib
+% For Harvard
+\usepackage[sort]{natbib} % and delete the authors' own natbib, unless sagej.cls is used in which case put [sort] into its natbib call
+\bibpunct[: ]{(}{)}{;}{a}{,}{,} % Reference style, and comment-out the one in sagej.cls
+% For Vancouver superscript without sagej.cls
+\usepackage{natbib}
+\setcitestyle{super}
+% For Vancouver in-line with sagej.cls, change the class file
+\usepackage[numbers,sort,compress]{natbib}
+
+% Biblatex (Sage Harvard)
+\usepackage[
+  backend=biber, % (default) rather than bibtex or bibtex8
+  natbib=true, % citep and citet compatibility
+  citestyle=authoryear-comp, % compacts [Doe (2011), Doe (2012)] to [Doe (2011,2012)]
+  bibstyle=authoryear,
+  labeldate=true, % (implied by bibstyle=authoryear)
+  sorting=nyt, % (implied by bibstyle=authoryear)
+  pagetracker=true, % (implied by bibstyle=authoryear)
+  mergedate=true, % (implied by bibstyle=authoryear)
+  sortcites=true, % also sort in-text citations
+  maxbibnames=3, % max allowable names in references
+  minbibnames=3, % no. of names to truncate to when exceeds maxnames in references
+  maxcitenames=3, % max allowable names in text
+  mincitenames=1, % no. of names to truncate to when exceeds maxnames in text
+  urldate=comp, % same as other date fields, like 21 January 2010
+  isbn=false,
+  url=false, % except @online entries
+  doi=false,
+  eprint=false,
+  firstinits=true,
+  sortfirstinits=true,
+  terseinits=true, % JM Barrie rather than J.M. Barrie
+  useprefix=true, % Van Beethoven, Ludwig
+  dashed=false % Repeat duplicate names
+]{biblatex}
+% Barrie JM
+\DeclareNameAlias{sortname}{last-first}
+\DeclareNameAlias{default}{last-first}
+\renewcommand*{\revsdnamepunct}{}
+% Upright title without quotation marks
+\DeclareFieldFormat
+  [article,inbook,incollection,inproceedings,patent,thesis,unpublished]
+  {title}{#1\isdot}
+% Remove comma after year
+\renewcommand{\labelnamepunct}{\addspace}
+% Surround volumne number in parentheses, remove dot and replace with : in
+% articles
+\renewbibmacro*{volume+number+eid}{%
+  \printfield{volume}%
+%  \setunit*{\adddot}% DELETED
+  \printfield{number}%
+  \setunit{\addcomma\space}%
+  \printfield{eid}}
+\DeclareFieldFormat[article]{number}{\mkbibparens{#1}\addcolon} 
+% No "In:" for @article
+\renewbibmacro{in:}{%
+\ifentrytype{article}{}{\printtext{\bibstring{in}\intitlepunct}}}
+% No pp. in articles
+\DeclareFieldFormat[article]{pages}{#1}
+% No comma before et al.
+\DefineBibliographyExtras{english}{\let\finalandcomma=\empty}
+
 
 % Sage
 \journal{Mathematics and Mechanics of Solids}
@@ -40,14 +101,89 @@
 \widowpenalty=10000
 \usepackage{varwidth}
 \usepackage{xcolor}
+\usepackage[noabbrev]{cleveref} % For equations (1) to (4) and (6), for an en-dash do \newcommand{\crefrangeconjunction}{--}
+%\usepackage{endfloat} % Comment this out if it has been used, to put figures
+%back in to the right place, if the the figures are at the end.
 
+% Query for keywords
+\query{Please provide a list of keywords.}
 
-\section*{Funding} 
+% Remove date from below title
+\title{Whatever the title is}
+\date{}
+\maketitle
 
+\begin{funding} 
 This research received no specific grant from any funding agency in the public,
 commercial, or not-for-profit sectors.
-
-This work was supported by xxxxxxxxxx (grant number xxxxxxxxx).
-
+\end{funding} 
 \query{Please check that the funding statement is correct.}
+
+\begin{funding} 
+This work was supported by xxxxxxxxxx (grant number xxxxxxxxx).
+\end{funding} 
+\query{Please check that the funding statement is correct.}
+
+
+\section*{Conflict of interest} 
+
+None declared.
+
+% HSS addresses 
+\noindent\textbf{Angela Madeo}\\
+Universit\'{e} de Lyon\textendash INSA (Institut National des Sciences
+Appliquées), Lyon, France\\\\
+\textbf{Alessandro Della Corte}\\
+Doctoral School in Theoretical and Applied Mechanics, University La
+Sapienza, Rome, Italy\\\\
+\textbf{Ivan Giorgio}\\
+Department of Structural and Geotechnical
+Engineering, University La Sapienza, Rome, Italy\\\\
+\textbf{Daria Scerrato}\\
+International Research Center on the Mathematics and Mechanics of
+Complex Systems (M\&MoCS), University of L'Aquila, L'Aquila, Italy%
+
+\begin{footnotesize}
+\noindent Date received 02 January 2013; accepted 11 March 2013\\
+\end{footnotesize}
+
+\maketitle
+
+\let\thefootnote\relax\footnotetext{\noindent\textbf{Corresponding author:} \\ Yubo Yuan, East China
+  University of Science and Technology, 130 Meilong Road, Xuhui Region, Shanghai
+  200137, China.}
+
+% STM addresses
+\author{Aaron~M~Johnson$^{1}$, Samuel~A~Burden$^{2}$ and Daniel~E~Koditschek$^{3}$\\
+{\small $^{1}$Department of Mathematics, University of Mazandaran, Iran}\\
+{\small $^{2}$Department of Mathematical Sciences, University of South Africa, South Africa}\\ 
+{\small$^{3}$Department of Mathematics and Computer Science, \c{C}ankaya University, Turkey}\\
+}
+\date{}
+\maketitle
+\let\thefootnote\relax\footnotetext{Corresponding author: Erik Komedera, Department of Computer Science, University of Colorado at Boulder, 430 UCB, Boulder, Colorado 80309, USA \\
+Email: erik.e.komendera@nasa.gov. This work was performed when both authors were with the University of Colorado Boulder.}
+
+% Appendix numbering
+\appendix
+\renewcommand{\thesection}{\arabic{section}}
+
+% IJR multimedia extension
+% Section heading should be a numbered appendix (if more than one, otherwise
+% Appendix: Index to Multimedia Extension
+% Check the caption for multiple extensions.
+\section{Index to Multimedia Extension}
+Archives of IJRR multimedia extensions published prior to 2014 can be found at 
+http://www.ijrr.org, after 2014 all videos are available on the IJRR YouTube channel 
+at http://www.youtube.com/user/ijrrmultimedia
+\begin{table}
+\centering
+\caption*{Table of multimedia extension}
+\begin{tabular}{lll}
+Extension & Media type & Description              \\
+1         & Video      & Video showing some stuff \\
+          &            &                          \\
+          &            &                         
+\end{tabular}
+\end{table}
 

@@ -1,12 +1,21 @@
-# Find long numbers without commas (need fixing)
-[0-9]{5,}
-^[0-9][0-9],[0-9]{3}
+# Find long numbers without commas
+[0-9][0-9]\{5,\}
+[^0-9][0-9],[0-9]\{3\}
 
 # Remove \textcolour{red}{sometext}
-%s/\\textcolor{red}{\(.\+\)}/\1/gc
+%s/\\textcolor{\{-}}{\(.\{-}\)}/\1/gc
 
 # Find eqref without preceeding "equation"
-%s/\([^equation]\ \)\(\\eqref\)/\1equation\ \2/gc
+,$s/\([^equation]\ \)\(\\eqref\)/\1equation\ \2/gc
+,$s/\([^equation]\)\~\(\\eqref\)/\1 equation\~\2/gc
+,$s/\(equation\)\@<! \\eqref/ equation \\eqref/gc
+,$s/\(equation\)\@<!\~\\eqref/ equation\~\\eqref/gc
+
+# Fix \ref surrounded by brackets (ought to be \eqref)
+,$s/\(equation\)\@<! \\eqref/ equation \\eqref/gc
+,$s/\(equation\)\@<!\~\\eqref/ equation\~\\eqref/gc
+,$s/(\\ref{\([^}]\+\)})/equation\ \\eqref{\1}/gc
+,$s/(\\ref{\([^}]\+\)})/\\eqref{\1}/gc
 
 # Find acronyms and their definitions
 [A-Z]\+[:alnum:]*[A-Z]\+[:alnum:]*
@@ -14,39 +23,60 @@
 
 # Correct - to --
 # and this / that to this/that
-%s/\ -\ /--/gc
-%s/-/--/gc
+\w\+-\w\+
 %s/\ \/\ /\//gc
+%s/\ -\ /--/gc
+%s/-\{1\}/--/gc
+# Page numbers in the bibliography
+,$s/\ --\ /--/gc
 
 # <space>, and <space>.
 %s/\ ,/,/gc
 %s/\ \././gc
 
-# cdots -> ldots
+# cdots -> ldots between commas, otherwise leave as cdots
 %s/\\cdots/\\ldots/gc
 
-# et~al.\ 
+# et~al.\  (but not in bibliography)
 %s/et\ al/et\~al/gc
 %s/et\~al\.\ /et\~al\.\\ /gc
 
 # i.e. e.g. not followed by small spaces
+%s/\\emph{i\.e\.}/i\.e\./gc
+%s/\\emph{e\.g\.}/e\.g\./gc
+%s/\\emph{etc\.}/etc\./gc
 %s/i\.e\.\ ,/i\.e\.\ /gc
 %s/e\.g\.\ ,/e\.g\.\ /gc
+%s/i\.e\.,/i\.e\./gc
+%s/e\.g\.,/e\.g\./gc
+
+# etc. without a full point
+%s/etc\ /etc\.\ /gc
 
 # Section, Table, Figure, Lemma, equation
-%s/section\(\_s\?\)\(\\ref{\)\C/Section\ \2/gc
-%s/table\(\_s\?\)\(\\ref{\)\C/Table\ \2/gc
-%s/figure\(\_s\?\)\(\\ref{\)\C/Figure\ \2/gc
-%s/lemma\(\_s\?\)\(\\ref{\)\C/Lemma\ \2/gc
-%s/Equation\(\_s\?\)\(\\ref{\)\C/equation\ \2/gc
-%s/Eqn\./equation/gc
-%s/Sec\./Section/gc
+%s/section\(\_s\?\)\(\\ref{\)\C/Section\~\2/gc
+%s/table\(\_s\?\)\(\\ref{\)\C/Table\~\2/gc
+%s/figure\(\_s\?\)\(\\ref{\)\C/Figure\~\2/gc
+%s/lemma\(\_s\?\)\(\\ref{\)\C/Lemma\~\2/gc
+%s/Equation\(\_s\?\)\(\\ref{\)\C/equation\~\2/gc
+%s/Fig\.\ /Figure\~/gc
+%s/Eqn\.\ /equation\~/gc
+%s/Sec\.\ /Section\~/gc
+# Also Thm. Lmm., Sec., etc.
+,$s/Figure\ \\ref/Figure\~\\ref/gc
+,$s/Table\ \\ref/Table\~\\ref/gc
+,$s/Section\ \\ref/Section\~\\ref/gc
+,$s/Appendix\ \\ref/Appendix\~\\ref/gc
+,$s/Figures\ \\ref/Figures\~\\ref/gc
+,$s/Tables\ \\ref/Tables\~\\ref/gc
+,$s/Sections\ \\ref/Sections\~\\ref/gc
 
 # Remove || in Google Scholar bibtex
 %s/||\ //gc
 
 # Remove parenthesis from around \cite
 %s/(\\cite{\([^}]\+\)})/\\cite{\1}/gc
+%s/(\\citet{\([^}]\+\)})/\\citep{\1}/gc
 
 # Add spaces before \cite
 %s/\([^\ ]\)\\cite{/\1\ \\cite{/gc
@@ -54,16 +84,25 @@
 # "in \citep" -> "in \citet"
 %s/\ in\ \\citep/\ in\ \\citet/gc
 %s/\ from\ \\citep/\ in\ \\citet/gc
+%s/\ in\ \\cite/\ in\ \\cite/gc
+%s/\ from\ \\cite/\ in\ \\cite/gc
+
+# Find cites of multiple documents (for ordering alphabetically)
+\\cite[pt]\?{[[:alnum:]]\+,
 
 # Add spaces before parentheses 
 %s/\([^ ]\)(/\1\ (/gc
 
 # Upright T for transpose
 %s/\^T/\^{\\rm\ T}/gc
+%s/\^{T}/\^{\\rm\ T}/gc
 
 # Upright d for dt (integration)
 %s/\\frac{d}{d\ /\\frac{\rm\ d}{\d\ /gc
+%s/\\frac{d}{d/\\frac{\\d}{\\d\ /gc
 %s/dt/\\d\ t/gc
+%s/ds/\\d\ s/gc
+%s/dx/\\d\ x/gc
 
 # vs not vs.
 %s/vs\./vs/gc
@@ -80,32 +119,73 @@
 # compared to -> compared with
 %s/compared\ to/compared\ with/gc
 
-# Capital Hessian
-%s/hessian\C/Hessian/gc
+# Remove punctuation before equations
+%s/\.\s*\n\\begin/\r\\begin/gc
+%s/,\s*\n\\begin/\r\\begin/gc
+%s/:\s*\n\\begin/\r\\begin/gc
+%s/\.\s*\n\$/\r\$/gc
+%s/,\s*\n\$/\r\$/gc
+%s/:\s*\n\$/\r\$/gc
 
-# Replace punctuation at the end of equations
+# Remove punctuation at the end of equations
 %s/\\text{.}//gc
 %s/\\text{,}//gc
 %s/\\text{\\,\.}//gc
 %s/\\text{\,\ }//gc
-
-# Fig. -> Figure
-%s/Fig\.\C/Figure/gc
+%s/\.\\\\/\\\\/gc
+%s/\.\s*\\\\/\\\\/gc
+%s/,\s*\\\\/\\\\/gc
+%s/)\./)/gc
+%s/\.\n\\end{eq/\r\\end{eq/gc
+%s/,\n\\end{eq/\r\\end{eq/gc
+%s/\.\n\\end{array/\r\\end{array/gc
+%s/,\n\\end{array/\r\\end{array/gc
+%s/\.\n\\end{multiline/\r\\end{multiline/gc
+%s/,\n\\end{multiline/\r\\end{multiline/gc
+%s/\.\n\\label/\r\\label/gc
+%s/,\n\\label/\r\\label/gc
+%s/\.\n\$\$/\r\$\$/gc
+%s/,\n\$\$/\r\$\$/gc
 
 # sine, cosine, max, min, arg
-%s/sin(/\\sin(/gc
-%s/cos(/\\cos(/gc
-%s/max(/\\max(/gc
-%s/min(/\\min(/gc
-%s/arg(/\\arg(/gc
+%s/[^\\]sin(/\\sin(/gc
+%s/[^\\]cos(/\\cos(/gc
+%s/[^\\]max(/\\max(/gc
+%s/[^\\]min(/\\min(/gc
+%s/[^\\]arg(/\\arg(/gc
 
 # Correct $n^{th}$ to $n$th
 %s/\^{st}\$/\$st/gc
+%s/\^{nd}\$/\$nd/gc
 %s/\^{rd}\$/\$rd/gc
 %s/\^{th}\$/\$th/gc
 
 # Correct straight quotes to smart quotes
 %s/"\(.\{-}\)"/``\1''/gc
+%s/"/''/gc
 
 # Spaces between numbers and units
 %s/\([0-9]\+\)\([a-zA-Z]\+\)/\1\\,\2/gc
+
+# Primes ^{'}' should be ^{\prime}
+ds/\^{'}/\^{\\prime}/gc
+%s/\^{''}/\^{\\prime\\prime}/gc
+
+# Remove superscript st nd rd th
+%s/\\textsuperscript{st}/\\textrm{st}/g
+%s/\\textsuperscript{nd}/\\textrm{nd}/g
+%s/\\textsuperscript{rd}/\\textrm{rd}/g
+%s/\\textsuperscript{th}/\\textrm{th}/g
+
+# Single numerals
+,$s/[^\^\-_{}()\.&#:=\$<>]\<1\>/one/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<2\>/two/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<3\>/three/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<4\>/four/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<5\>/five/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<6\>/six/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<7\>/seven/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<8\>/eight/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<9\>/nine/gc
+,$s/[^\^\-_{}()\.&#:=\$<>]\<0\>/zero/gc
+,$s/\<ten\>/10/gc
